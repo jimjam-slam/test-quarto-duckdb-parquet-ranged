@@ -1,0 +1,9 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Untitled",
+    "section": "",
+    "text": "acorn = DuckDBClient.of({\n  metadata: FileAttachment(\"/data/acorn-metadata.csv\"),\n  obs: FileAttachment(\"/data/acorn-sat.parquet\")\n})\n\nacorn\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nLet’s grab a subset of the ACORN-SAT data:\n\nacornData = acorn.sql`\nSELECT\n  date, tmax\nFROM\n  obs\nWHERE\n  site_num == '086338'\n`\n\n\n\n\n\n\n\nInputs.table(acornData)"
+  }
+]
