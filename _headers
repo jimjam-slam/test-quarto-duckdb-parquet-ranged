@@ -1,0 +1,3 @@
+/data/acorn-sat.parquet
+  access-control-allow-headers: range
+  accept-ranges: bytes
