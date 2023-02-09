@@ -5,4 +5,6 @@ Quick test to see if Quarto can use ranged HTTP requests when querying a Parquet
 
 `acorn.r`: package ACORN-SAT 2.3 files into a Parquet file.
 
-`index.qmd`: test to see if the Parquet file is accessed using HTTP ranged requests when accessed with the Observervable DuckDB client.
+`index.qmd`: test to see if the Parquet file is accessed using HTTP ranged requests when accessed with the Observable DuckDB client.
+  - The doc has been updated to pull the file directly from GitHub rather than locally, but it's still not working. It does look like DuckDB-WASM has the ability to do ranged requests, though, so this is likely a case of bad headers from the server. Will play around more!
+  

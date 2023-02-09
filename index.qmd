@@ -7,7 +7,9 @@ format: html
 
 acorn = DuckDBClient.of({
   metadata: FileAttachment("/data/acorn-metadata.csv"),
-  obs: FileAttachment("/data/acorn-sat.parquet")
+  // obs: FileAttachment("/data/acorn-sat.parquet")
+  obs: FileAttachment(
+    "https://raw.githubusercontent.com/jimjam-slam/test-quarto-duckdb-parquet-ranged/main/data/acorn-sat.parquet")
 })
 
 acorn
@@ -17,12 +19,12 @@ Let's grab a subset of the ACORN-SAT data:
 
 ```{ojs}
 acornData = acorn.sql`
-SELECT
-  date, tmax
-FROM
-  obs
-WHERE
-  site_num == '086338'
+  SELECT
+    date, tmax
+  FROM
+    obs
+  WHERE
+    site_num == '086338'
 `
 ```
 
