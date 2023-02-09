@@ -1,0 +1,31 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{ojs}
+
+acorn = DuckDBClient.of({
+  metadata: FileAttachment("/data/acorn-metadata.csv"),
+  obs: FileAttachment("/data/acorn-sat.parquet")
+})
+
+acorn
+```
+
+Let's grab a subset of the ACORN-SAT data:
+
+```{ojs}
+acornData = acorn.sql`
+SELECT
+  date, tmax
+FROM
+  obs
+WHERE
+  site_num == '086338'
+`
+```
+
+```{ojs}
+Inputs.table(acornData)
+```
