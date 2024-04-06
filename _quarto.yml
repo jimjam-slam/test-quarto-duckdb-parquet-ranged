@@ -2,6 +2,8 @@ project:
   type: website
   resources: 
     - "_headers"
+    - "data/acorn-sat.parquet"
+    - "data/acorn-metadata.csv"
 
 execute:
   freeze: auto
