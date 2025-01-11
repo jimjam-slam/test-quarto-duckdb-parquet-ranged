@@ -1,5 +1,5 @@
 library(tidyverse)
-library(arrow)
+library(nanoparquet)
 library(here)
 
 dir.create(here("data", "import"), showWarnings = FALSE, recursive = TRUE)
@@ -57,4 +57,24 @@ tidy_data
 # now let's export to parquet!
 tidy_data |>
   select(site_num = station_num, date, tmax, tmin) |>
-  write_parquet(here("data", "acorn-sat.parquet"))
+  write_parquet(here("data", "acorn-sat.parquet"),
+    compression = "gzip")
+
+# let's also export site-grouped and date-grouped parquets for comparison
+tidy_data |>
+  select(site_num = station_num, date, tmax, tmin) |>
+  group_by(date) |>
+  write_parquet(here("data", "acorn-sat-bydate.parquet"),
+    compression = "gzip")
+
+tidy_data |>
+  select(site_num = station_num, date, tmax, tmin) |>
+  group_by(site_num) |>
+  write_parquet(here("data", "acorn-sat-bysite.parquet"),
+    compression = "gzip")
+
+tidy_data |>
+  select(site_num = station_num, date, tmax, tmin) |>
+  group_by(site_num, date) |>
+  write_parquet(here("data", "acorn-sat-grouped.parquet"),
+    compression = "gzip")
