@@ -1,3 +1,10 @@
 /.quarto/
 .DS_Store
-/data/import
+
+# ignore imported data
+# (except the README, which is a good record of the ACORN-SAT version
+# we're using)
+
+!/data/import/
+/data/import/*
+!/data/import/README.txt

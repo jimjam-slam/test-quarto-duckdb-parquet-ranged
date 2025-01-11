@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Untitled</title>
+<title>DuckDB ranged requests</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -33,7 +33,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -118,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Untitled</h1>
+<h1 class="title">DuckDB ranged requests</h1>
 </div>
 
 
@@ -135,15 +135,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<p>When I go to <a href="https://shell.duckdb.org">shell.duckdb.org</a> and run the following query, only 6.5 MB of data is downloaded (the whole file is about 17 MB), thanks to HTTP Range Requests:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>   site_num, <span class="dt">date</span>, tmax</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">FROM</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>   read_parquet(<span class="st">'https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet'</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> <span class="kw">WHERE</span> <span class="dt">date</span> <span class="op">=</span> <span class="st">'2021-12-20'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>But when I use Quarto’s built-in version of DuckDB-WASM, or <a href="https://observablehq.com">Observable’s</a>, I get the following console warning and the whole file is downloaded:</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>falling back to full HTTP read for: <a href="https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet" class="uri">https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet</a></p>
+</div>
+</div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1" data-startfrom="8" data-source-offset="-1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 7;"><span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>acorn <span class="op">=</span> DuckDBClient<span class="op">.</span><span class="fu">of</span>({</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">metadata</span><span class="op">:</span> <span class="fu">FileAttachment</span>(<span class="st">"/data/acorn-metadata.csv"</span>)<span class="op">,</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// obs: FileAttachment("/data/acorn-sat.parquet")</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">obs</span><span class="op">:</span> <span class="fu">FileAttachment</span>(</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://raw.githubusercontent.com/jimjam-slam/test-quarto-duckdb-parquet-ranged/main/data/acorn-sat.parquet"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>acorn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2" data-startfrom="24" data-source-offset="-1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 23;"><span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>acorn <span class="op">=</span> DuckDBClient<span class="op">.</span><span class="fu">of</span>({</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="dt">metadata</span><span class="op">:</span> <span class="fu">FileAttachment</span>(<span class="st">"https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-metadata.csv"</span>)<span class="op">,</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">obs</span><span class="op">:</span> <span class="fu">FileAttachment</span>(<span class="st">"https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet"</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>acorn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-1-1" data-nodetype="declaration">
@@ -161,14 +179,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Let’s grab a subset of the ACORN-SAT data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2" data-startfrom="20" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 19;"><span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>acornData <span class="op">=</span> acorn<span class="op">.</span><span class="fu">sql</span><span class="vs">`</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="vs">  SELECT</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="vs">    date, tmax</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="vs">  FROM</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="vs">    obs</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="vs">  WHERE</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="vs">    site_num == '086338'</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3" data-startfrom="34" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 33;"><span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>acornData <span class="op">=</span> acorn<span class="op">.</span><span class="fu">sql</span><span class="vs">`</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="vs">  SELECT</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="vs">    site_num, date, tmax</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="vs">  FROM</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="vs">    obs</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="vs">  WHERE</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="vs">    date = '2021-12-20'</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div id="ojs-cell-2" data-nodetype="declaration">
 
@@ -176,19 +194,123 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3" data-startfrom="31" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 30;"><span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>Inputs<span class="op">.</span><span class="fu">table</span>(acornData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4" data-startfrom="45" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 44;"><span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>Inputs<span class="op">.</span><span class="fu">table</span>(acornData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div id="ojs-cell-3" data-nodetype="expression">
 
 </div>
 </div>
 </div>
+<section id="import-a-newer-duckdb-manually" class="level1">
+<h1>Import a newer DuckDB manually?</h1>
+<p>Maybe we can import a newer version of DuckDB and use that? I’ve <a href="https://observablehq.com/@jimjamslam/duck">forked</a> the original CRU DuckDB client for Observable and bumped the underlying DuckDB version to 1.29.0:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" data-startfrom="54" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 53;"><span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>newDuck <span class="op">=</span> <span class="im">import</span>(<span class="st">"https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/+esm"</span>)</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>newDuck</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-2" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb6" data-startfrom="58" data-source-offset="-91"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 57;"><span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { DuckClient } <span class="im">from</span> <span class="st">"@jimjamslam/duck"</span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>DuckClient</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-4" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb7" data-startfrom="62" data-source-offset="-150"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 61;"><span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { arrow } <span class="im">from</span> <span class="st">"@jimjamslam/duck"</span></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>arrow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-6" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I’ve renamed <code>DuckDBClient</code> to <code>DuckClient</code> in this fork so that I can test the two simultaneously; Observable’s static notebook imports don’t seem to support aliases.</p>
+</div>
+</div>
+<p>Let’s try it again with the new client:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" data-startfrom="73" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 72;"><span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>acornNew <span class="op">=</span> DuckClient<span class="op">.</span><span class="fu">of</span>({</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>  <span class="dt">obs</span><span class="op">:</span> <span class="fu">FileAttachment</span>(<span class="st">"https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet"</span>)</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" data-startfrom="79" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 78;"><span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>acornDataNew <span class="op">=</span> acornNew<span class="op">.</span><span class="fu">sql</span><span class="vs">`</span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a><span class="vs">  SELECT</span></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="vs">    site_num, date, tmax</span></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a><span class="vs">  FROM</span></span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a><span class="vs">    obs</span></span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a><span class="vs">  WHERE</span></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="vs">    date = '2021-12-20'</span></span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" data-startfrom="90" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 89;"><span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a>Inputs<span class="op">.</span><span class="fu">table</span>(acornDataNew)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-7" data-nodetype="expression">
+
+</div>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script type="ojs-module-contents">
-eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IlxuYWNvcm4gPSBEdWNrREJDbGllbnQub2Yoe1xuICBtZXRhZGF0YTogRmlsZUF0dGFjaG1lbnQoXCIvZGF0YS9hY29ybi1tZXRhZGF0YS5jc3ZcIiksXG4gIC8vIG9iczogRmlsZUF0dGFjaG1lbnQoXCIvZGF0YS9hY29ybi1zYXQucGFycXVldFwiKVxuICBvYnM6IEZpbGVBdHRhY2htZW50KFxuICAgIFwiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ppbWphbS1zbGFtL3Rlc3QtcXVhcnRvLWR1Y2tkYi1wYXJxdWV0LXJhbmdlZC9tYWluL2RhdGEvYWNvcm4tc2F0LnBhcnF1ZXRcIilcbn0pXG5cbmFjb3JuXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTIiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJhY29ybkRhdGEgPSBhY29ybi5zcWxgXG4gIFNFTEVDVFxuICAgIGRhdGUsIHRtYXhcbiAgRlJPTVxuICAgIG9ic1xuICBXSEVSRVxuICAgIHNpdGVfbnVtID09ICcwODYzMzgnXG5gXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTMiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJJbnB1dHMudGFibGUoYWNvcm5EYXRhKVxuIn1dfQ==
+eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IlxuYWNvcm4gPSBEdWNrREJDbGllbnQub2Yoe1xuICBtZXRhZGF0YTogRmlsZUF0dGFjaG1lbnQoXCJodHRwczovL2ppbWphbS1zbGFtLmdpdGh1Yi5pby90ZXN0LXF1YXJ0by1kdWNrZGItcGFycXVldC1yYW5nZWQvZGF0YS9hY29ybi1tZXRhZGF0YS5jc3ZcIiksXG4gIG9iczogRmlsZUF0dGFjaG1lbnQoXCJodHRwczovL2ppbWphbS1zbGFtLmdpdGh1Yi5pby90ZXN0LXF1YXJ0by1kdWNrZGItcGFycXVldC1yYW5nZWQvZGF0YS9hY29ybi1zYXQucGFycXVldFwiKVxufSlcblxuYWNvcm5cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6ImFjb3JuRGF0YSA9IGFjb3JuLnNxbGBcbiAgU0VMRUNUXG4gICAgc2l0ZV9udW0sIGRhdGUsIHRtYXhcbiAgRlJPTVxuICAgIG9ic1xuICBXSEVSRVxuICAgIGRhdGUgPSAnMjAyMS0xMi0yMCdcbmBcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMyIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IklucHV0cy50YWJsZShhY29ybkRhdGEpXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTQiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJuZXdEdWNrID0gaW1wb3J0KFwiaHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L25wbS9AZHVja2RiL2R1Y2tkYi13YXNtQDEuMjkuMC8rZXNtXCIpXG5cbm5ld0R1Y2tcblxuaW1wb3J0IHsgRHVja0NsaWVudCB9IGZyb20gXCJAamltamFtc2xhbS9kdWNrXCJcblxuRHVja0NsaWVudFxuXG5pbXBvcnQgeyBhcnJvdyB9IGZyb20gXCJAamltamFtc2xhbS9kdWNrXCJcblxuYXJyb3dcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6ImFjb3JuTmV3ID0gRHVja0NsaWVudC5vZih7XG4gIG9iczogRmlsZUF0dGFjaG1lbnQoXCJodHRwczovL2ppbWphbS1zbGFtLmdpdGh1Yi5pby90ZXN0LXF1YXJ0by1kdWNrZGItcGFycXVldC1yYW5nZWQvZGF0YS9hY29ybi1zYXQucGFycXVldFwiKVxufSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6ImFjb3JuRGF0YU5ldyA9IGFjb3JuTmV3LnNxbGBcbiAgU0VMRUNUXG4gICAgc2l0ZV9udW0sIGRhdGUsIHRtYXhcbiAgRlJPTVxuICAgIG9ic1xuICBXSEVSRVxuICAgIGRhdGUgPSAnMjAyMS0xMi0yMCdcbmBcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNyIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IklucHV0cy50YWJsZShhY29ybkRhdGFOZXcpXG4ifV19
 </script>
 <script type="module">
 if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
