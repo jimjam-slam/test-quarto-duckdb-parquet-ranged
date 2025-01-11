@@ -1,15 +1,29 @@
 ---
-title: "Untitled"
+title: "DuckDB ranged requests"
 format: html
 ---
+
+When I go to [shell.duckdb.org](https://shell.duckdb.org) and run the following query, only 6.5 MB of data is downloaded (the whole file is about 17 MB), thanks to HTTP Range Requests:
+
+```sql
+SELECT
+   site_num, date, tmax
+ FROM
+   read_parquet('https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet')
+ WHERE date = '2021-12-20';
+```
+
+But when I use Quarto's built-in version of DuckDB-WASM, or [Observable's](https://observablehq.com), I get the following console warning and the whole file is downloaded:
+
+:::{.callout-warning}
+falling back to full HTTP read for: <https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet>
+:::
 
 ```{ojs}
 
 acorn = DuckDBClient.of({
-  metadata: FileAttachment("/data/acorn-metadata.csv"),
-  // obs: FileAttachment("/data/acorn-sat.parquet")
-  obs: FileAttachment(
-    "https://raw.githubusercontent.com/jimjam-slam/test-quarto-duckdb-parquet-ranged/main/data/acorn-sat.parquet")
+  metadata: FileAttachment("https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-metadata.csv"),
+  obs: FileAttachment("https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet")
 })
 
 acorn
@@ -20,14 +34,59 @@ Let's grab a subset of the ACORN-SAT data:
 ```{ojs}
 acornData = acorn.sql`
   SELECT
-    date, tmax
+    site_num, date, tmax
   FROM
     obs
   WHERE
-    site_num == '086338'
+    date = '2021-12-20'
 `
 ```
 
 ```{ojs}
 Inputs.table(acornData)
+```
+
+# Import a newer DuckDB manually?
+
+Maybe we can import a newer version of DuckDB and use that? I've [forked](https://observablehq.com/@jimjamslam/duck) the original CRU DuckDB client for Observable and bumped the underlying DuckDB version to 1.29.0:
+
+```{ojs}
+newDuck = import("https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/+esm")
+
+newDuck
+
+import { DuckClient } from "@jimjamslam/duck"
+
+DuckClient
+
+import { arrow } from "@jimjamslam/duck"
+
+arrow
+```
+
+:::{.callout-note}
+I've renamed `DuckDBClient` to `DuckClient` in this fork so that I can test the two simultaneously; Observable's static notebook imports don't seem to support aliases.
+:::
+
+Let's try it again with the new client:
+
+```{ojs}
+acornNew = DuckClient.of({
+  obs: FileAttachment("https://jimjam-slam.github.io/test-quarto-duckdb-parquet-ranged/data/acorn-sat.parquet")
+})
+```
+
+```{ojs}
+acornDataNew = acornNew.sql`
+  SELECT
+    site_num, date, tmax
+  FROM
+    obs
+  WHERE
+    date = '2021-12-20'
+`
+```
+
+```{ojs}
+Inputs.table(acornDataNew)
 ```
